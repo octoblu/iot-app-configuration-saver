@@ -105,3 +105,58 @@ describe 'IotAppConfigurationSaver', ->
             return done error if error?
             expect(JSON.parse flowData).to.equal 'stop'
             done()
+
+  describe '->linkToBluprint', ->
+    beforeEach 'insert flow', (done) ->
+      @flowData = JSON.stringify {
+        node1:
+          config: { bees: true }
+          data: {}
+        node2:
+          config: {bee_size: '4000m'}
+          data: {}
+      }
+
+      @datastore.insert flowId: 'some-flow-id', instanceId: 'some-instance-id', flowData: @flowData, done
+
+    beforeEach 'run linkToBluprint', (done) ->
+      options =
+        appId: 'some-app-id'
+        config: {bee_color: 'blue'},
+        configSchema: { type: 'string' }
+        flowId: 'some-flow-id'
+        instanceId: 'some-instance-id'
+        version: '1'
+
+      @sut.linkToBluprint options, done
+
+    beforeEach 'get flow', (done) ->
+      @flowData = JSON.stringify {
+        node1:
+          config: { bees: true }
+          data: {}
+        node2:
+          config: {bee_size: '4000m'}
+          data: {}
+      }
+
+      @datastore.findOne flowId: 'some-flow-id', instanceId: 'some-instance-id', (error, {flowData}) =>
+        @flowData = JSON.parse(flowData)
+        done()
+
+
+    it 'should update the flow data with the bluprint config', ->
+      expect(@flowData).to.deep.equal(
+          node1:
+            config: { bees: true }
+            data: {}
+          node2:
+            config: {bee_size: '4000m'}
+            data: {}
+          bluprint:
+            config:
+              appId: 'some-app-id'
+              config: {bee_color: 'blue'},
+              configSchema: { type: 'string' }
+              version: '1'
+      )
