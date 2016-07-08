@@ -140,23 +140,28 @@ describe 'IotAppConfigurationSaver', ->
           data: {}
       }
 
-      @datastore.findOne flowId: 'some-flow-id', instanceId: 'some-instance-id', (error, {flowData}) =>
+      @datastore.findOne flowId: 'some-flow-id', instanceId: 'some-instance-id', (error, {flowData, @bluprint}) =>
         @flowData = JSON.parse(flowData)
         done()
 
 
     it 'should update the flow data with the bluprint config', ->
-      expect(@flowData).to.deep.equal(
-          node1:
-            config: { bees: true }
-            data: {}
-          node2:
-            config: {bee_size: '4000m'}
-            data: {}
-          bluprint:
-            config:
-              appId: 'some-app-id'
-              config: {bee_color: 'blue'},
-              configSchema: { type: 'string' }
-              version: '1'
-      )
+      expect(@flowData).to.deep.equal
+        node1:
+          config: { bees: true }
+          data: {}
+        node2:
+          config: {bee_size: '4000m'}
+          data: {}
+        bluprint:
+          config:
+            appId: 'some-app-id'
+            config: {bee_color: 'blue'},
+            configSchema: { type: 'string' }
+            version: '1'
+
+
+    it 'should write a pointer to the bluprint', ->
+      expect(@bluprint).to.deep.equal
+        appId: 'some-app-id'
+        version: '1'

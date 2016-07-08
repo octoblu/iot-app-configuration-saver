@@ -27,7 +27,7 @@ class IotAppConfigurationSaver
     flowData = JSON.stringify flowData
     @datastore.insert {appId, version, flowData}, callback
 
-  linkToBluprint: ({appId, config, configSchema, flowId, instanceId, version}, callback) =>    
+  linkToBluprint: ({appId, config, configSchema, flowId, instanceId, version}, callback) =>
     @datastore.findOne {flowId, instanceId}, (error, {flowData}) =>
       return callback error if error?
       flowData = JSON.parse flowData
@@ -39,7 +39,7 @@ class IotAppConfigurationSaver
           version
         }
       flowData = JSON.stringify flowData
-      @datastore.update {flowId, instanceId}, {$set: {flowData}}, callback
+      @datastore.update {flowId, instanceId}, {$set: {flowData, bluprint: {appId, version}}}, callback
 
 
 module.exports = IotAppConfigurationSaver
