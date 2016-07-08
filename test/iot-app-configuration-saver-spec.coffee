@@ -4,12 +4,15 @@ mongojs                = require 'mongojs'
 IotAppConfigurationSaver = require '..'
 
 describe 'IotAppConfigurationSaver', ->
-  beforeEach (done) ->
+  beforeEach ->
     db = mongojs 'localhost/flow-config-test', ['instances']
     @datastore = new Datastore
       database: db
       collection: 'instances'
-    db.instances.remove done
+
+  afterEach (done) ->
+    db = mongojs 'localhost/flow-config-test', ['instances']
+    db.instances.drop done
 
   beforeEach ->
     @sut = new IotAppConfigurationSaver {@datastore}
@@ -40,25 +43,12 @@ describe 'IotAppConfigurationSaver', ->
         @sut.save appId: 'some-bluprint-uuid', version: '1', flowData: @flowData, done
 
       beforeEach (done) ->
-        @flowData = 'stop'
-
-        @sut.save appId: 'some-bluprint-uuid-stop', version: '1', flowData: @flowData, done
-
-      beforeEach (done) ->
         @sut.stop appId: 'some-bluprint-uuid', version: '1', done
 
-      it 'should remove the stop configuration', (done) ->
-        @datastore.findOne {appId: 'some-bluprint-uuid-stop', version: '1'}, (error, result) =>
-          return done error if error?
+      it 'should remove the configuration', (done) ->
+        @datastore.findOne appId: 'some-bluprint-uuid', version: '1', (error, result) =>
           expect(result).not.to.exist
-          done()
-
-      describe 'after the config is removed', ->
-        it 'should replace the configuration with the stop configuration', (done) ->
-          @datastore.findOne {appId: 'some-bluprint-uuid', version: '1'}, (error, {flowData}) =>
-            return done error if error?
-            expect(JSON.parse flowData).to.equal 'stop'
-            done()
+          done error
 
     describe 'with two instances', ->
       beforeEach (done) ->
@@ -75,36 +65,13 @@ describe 'IotAppConfigurationSaver', ->
         @sut.save appId: 'some-bluprint-uuid', version: 'other-instance-id', flowData: @flowData, done
 
       beforeEach (done) ->
-        @flowData = 'stop'
-
-        @sut.save appId: 'some-bluprint-uuid-stop', version: '1', flowData: @flowData, done
-
-      beforeEach (done) ->
-        @flowData = 'stop'
-
-        @sut.save appId: 'some-bluprint-uuid-stop', version: 'other-instance-id', flowData: @flowData, done
-
-      beforeEach (done) ->
         @sut.stop appId: 'some-bluprint-uuid', version: '1', done
 
       it 'should remove the stop configuration', (done) ->
-        @datastore.findOne {appId: 'some-bluprint-uuid-stop', version: '1'}, (error, result) =>
+        @datastore.findOne {appId: 'some-bluprint-uuid', version: '1'}, (error, result) =>
           return done error if error?
           expect(result).not.to.exist
           done()
-
-      describe 'after the config is removed', ->
-        it 'should replace the configuration with the stop configuration', (done) ->
-          @datastore.findOne {appId: 'some-bluprint-uuid', version: '1'}, (error, {flowData}) =>
-            return done error if error?
-            expect(JSON.parse flowData).to.equal 'stop'
-            done()
-
-        it 'should change the other instance', (done) ->
-          @datastore.findOne {appId: 'some-bluprint-uuid', version: 'other-instance-id'}, (error, {flowData}) =>
-            return done error if error?
-            expect(JSON.parse flowData).to.equal 'stop'
-            done()
 
   describe '->linkToBluprint', ->
     beforeEach 'insert flow', (done) ->
