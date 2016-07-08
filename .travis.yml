@@ -4,9 +4,6 @@ node_js:
 branches:
   only:
   - /^v[0-9]/
-addons:
-  code_climate:
-    repo_token: <REPO TOKEN GOES HERE>
 before_script:
 - npm install -g codeclimate-test-reporter
 after_script:
