@@ -99,15 +99,6 @@ describe 'IotAppConfigurationSaver', ->
       @sut.linkToBluprint options, done
 
     beforeEach 'get flow', (done) ->
-      @flowData = JSON.stringify {
-        node1:
-          config: { bees: true }
-          data: {}
-        node2:
-          config: {bee_size: '4000m'}
-          data: {}
-      }
-
       @datastore.findOne flowId: 'some-flow-id', instanceId: 'some-instance-id', (error, {flowData, @bluprint, @hash}) =>
         @flowData = JSON.parse(flowData)
         done()
@@ -128,6 +119,21 @@ describe 'IotAppConfigurationSaver', ->
             configSchema: { type: 'string' }
             version: '1'
 
+    describe 'when unlinkToBluprint is then called', ->
+        beforeEach 'run unlinkToBluprint', (done) ->
+          options =
+            flowId: 'some-flow-id'
+            instanceId: 'some-instance-id'
+
+          @sut.unlinkToBluprint options, done
+
+        beforeEach 'get flow', (done) ->
+          @datastore.findOne flowId: 'some-flow-id', instanceId: 'some-instance-id', (error, {flowData, @bluprint, @hash}) =>
+            @flowData = JSON.parse(flowData)
+            done()
+
+        it 'should not have a bluprint property', ->
+          expect(@flowData.bluprint).not.to.exist
 
     it 'should write a pointer to the bluprint', ->
       expect(@bluprint).to.deep.equal
@@ -135,4 +141,4 @@ describe 'IotAppConfigurationSaver', ->
         version: '1'
 
     it 'should update the flow\'s hash', ->
-      expect(@hash).to.deep.equal '507982a562d266cf368b3b3e45b1274d64a5a498ca7bfaa0df738a6e1f495a7b'        
+      expect(@hash).to.deep.equal '507982a562d266cf368b3b3e45b1274d64a5a498ca7bfaa0df738a6e1f495a7b'
