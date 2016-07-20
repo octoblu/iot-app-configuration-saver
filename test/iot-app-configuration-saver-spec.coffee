@@ -27,9 +27,10 @@ describe 'IotAppConfigurationSaver', ->
       @sut.save appId: 'some-bluprint-uuid', version: '1', flowData: @flowData, done
 
     it 'should save to mongo', (done) ->
-      @datastore.findOne {appId: 'some-bluprint-uuid', version: '1'}, (error, {flowData}) =>
+      @datastore.findOne {appId: 'some-bluprint-uuid', version: '1'}, (error, {flowData, hash}) =>
         return done error if error?
         expect(JSON.parse flowData).to.deep.equal @flowData
+        expect(hash).to.equal 'b9a0d397b7ed55c26440b0281328735e06e961bda05869de6f4718f7fea8a8cb'
         done()
 
   describe '->stop', ->

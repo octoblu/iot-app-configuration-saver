@@ -1,4 +1,5 @@
 async = require 'async'
+crypto = require 'crypto'
 
 class IotAppConfigurationSaver
   constructor: ({@datastore}) ->
@@ -9,7 +10,8 @@ class IotAppConfigurationSaver
 
   save: ({appId, version, flowData}, callback) =>
     flowData = JSON.stringify flowData
-    @datastore.insert {appId, version, flowData}, callback
+    hash = @hash flowData
+    @datastore.insert {appId, version, flowData, hash}, callback
 
   linkToBluprint: ({appId, config, configSchema, flowId, instanceId, version}, callback) =>
     @datastore.findOne {flowId, instanceId}, (error, {flowData}) =>
@@ -25,5 +27,7 @@ class IotAppConfigurationSaver
       flowData = JSON.stringify flowData
       @datastore.update {flowId, instanceId}, {$set: {flowData, bluprint: {appId, version}}}, callback
 
+  hash: (flowData) =>
+    crypto.createHash('sha256').update(flowData).digest 'hex'
 
 module.exports = IotAppConfigurationSaver
