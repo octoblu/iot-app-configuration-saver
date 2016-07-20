@@ -25,7 +25,8 @@ class IotAppConfigurationSaver
           version
         }
       flowData = JSON.stringify flowData
-      @datastore.update {flowId, instanceId}, {$set: {flowData, bluprint: {appId, version}}}, callback
+      hash = @hash flowData
+      @datastore.update {flowId, instanceId}, {$set: {flowData, bluprint: {appId, version}, hash}}, callback
 
   hash: (flowData) =>
     crypto.createHash('sha256').update(flowData).digest 'hex'

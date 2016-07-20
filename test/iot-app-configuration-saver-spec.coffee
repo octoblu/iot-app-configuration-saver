@@ -108,7 +108,7 @@ describe 'IotAppConfigurationSaver', ->
           data: {}
       }
 
-      @datastore.findOne flowId: 'some-flow-id', instanceId: 'some-instance-id', (error, {flowData, @bluprint}) =>
+      @datastore.findOne flowId: 'some-flow-id', instanceId: 'some-instance-id', (error, {flowData, @bluprint, @hash}) =>
         @flowData = JSON.parse(flowData)
         done()
 
@@ -133,3 +133,6 @@ describe 'IotAppConfigurationSaver', ->
       expect(@bluprint).to.deep.equal
         appId: 'some-app-id'
         version: '1'
+
+    it 'should update the flow\'s hash', ->
+      expect(@hash).to.deep.equal '507982a562d266cf368b3b3e45b1274d64a5a498ca7bfaa0df738a6e1f495a7b'        
