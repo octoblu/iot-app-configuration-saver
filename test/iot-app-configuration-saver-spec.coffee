@@ -125,24 +125,22 @@ describe 'IotAppConfigurationSaver', ->
     it 'should update the flow\'s hash', ->
       expect(@hash).to.equal '507982a562d266cf368b3b3e45b1274d64a5a498ca7bfaa0df738a6e1f495a7b'
 
-    describe 'when unlinkToBluprint is then called', ->
-        beforeEach 'run unlinkToBluprint', (done) ->
+    describe 'when stopIotApp is then called', ->
+        beforeEach 'run stopIotApp', (done) ->
           options =
+            appId: 'some-app-id'
             flowId: 'some-flow-id'
             instanceId: 'some-instance-id'
 
-          @sut.unlinkToBluprint options, done
+          @sut.stopIotApp options, done
 
         beforeEach 'get flow', (done) ->
           @datastore.findOne flowId: 'some-flow-id', instanceId: 'some-instance-id', (error, {flowData, @bluprint, @hash}) =>
             @flowData = JSON.parse(flowData)
             done()
 
-        it 'should not have a bluprint property', ->
-          expect(@flowData.bluprint).not.to.exist
-
         it 'should delete the pointer to the bluprint', ->
-          expect(@bluprint).not.to.exist
+          expect(@bluprint.appId).to.equal 'some-app-id-stop'
 
         it 'should update the flow\'s hash', ->
           expect(@hash).to.not.equal '507982a562d266cf368b3b3e45b1274d64a5a498ca7bfaa0df738a6e1f495a7b'

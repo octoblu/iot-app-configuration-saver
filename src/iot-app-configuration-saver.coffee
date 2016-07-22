@@ -28,14 +28,12 @@ class IotAppConfigurationSaver
       hash = @hash flowData
       @datastore.update {flowId, instanceId}, {$set: {flowData, bluprint: {appId, version}, hash}}, callback
 
-  unlinkToBluprint: ({flowId, instanceId}, callback) =>
-    @datastore.findOne {flowId, instanceId}, (error, {flowData}) =>
+  stopIotApp: ({appId, flowId, instanceId}, callback) =>
+    @datastore.findOne {flowId, instanceId}, (error, {flowData, bluprint}) =>
       return callback error if error?
-      flowData = JSON.parse flowData
-      delete flowData.bluprint
-      flowData = JSON.stringify flowData
-      hash = @hash flowData
-      @datastore.update {flowId, instanceId}, {$set: {flowData, hash}, $unset: {bluprint: ""}}, callback
+      hash = @hash "#{flowData}-stop"
+      bluprint.appId = "#{appId}-stop"
+      @datastore.update {flowId, instanceId}, {$set: {bluprint, hash}}, callback
 
   hash: (flowData) =>
     crypto.createHash('sha256').update(flowData).digest 'hex'
