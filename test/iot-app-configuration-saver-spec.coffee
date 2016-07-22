@@ -119,6 +119,12 @@ describe 'IotAppConfigurationSaver', ->
             configSchema: { type: 'string' }
             version: '1'
 
+    it 'should delete the pointer to the bluprint', ->
+      expect(@bluprint).to.exist
+
+    it 'should update the flow\'s hash', ->
+      expect(@hash).to.equal '507982a562d266cf368b3b3e45b1274d64a5a498ca7bfaa0df738a6e1f495a7b'
+
     describe 'when unlinkToBluprint is then called', ->
         beforeEach 'run unlinkToBluprint', (done) ->
           options =
@@ -135,10 +141,8 @@ describe 'IotAppConfigurationSaver', ->
         it 'should not have a bluprint property', ->
           expect(@flowData.bluprint).not.to.exist
 
-    it 'should write a pointer to the bluprint', ->
-      expect(@bluprint).to.deep.equal
-        appId: 'some-app-id'
-        version: '1'
+        it 'should delete the pointer to the bluprint', ->
+          expect(@bluprint).not.to.exist
 
-    it 'should update the flow\'s hash', ->
-      expect(@hash).to.deep.equal '507982a562d266cf368b3b3e45b1274d64a5a498ca7bfaa0df738a6e1f495a7b'
+        it 'should update the flow\'s hash', ->
+          expect(@hash).to.not.equal '507982a562d266cf368b3b3e45b1274d64a5a498ca7bfaa0df738a6e1f495a7b'
