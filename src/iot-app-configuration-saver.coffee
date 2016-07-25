@@ -31,6 +31,7 @@ class IotAppConfigurationSaver
   stopIotApp: ({appId, flowId, instanceId}, callback) =>
     @datastore.findOne {flowId, instanceId}, (error, {flowData, bluprint}) =>
       return callback error if error?
+      bluprint ?= {}
       hash = @hash "#{flowData}-stop"
       bluprint.appId = "#{appId}-stop"
       @datastore.update {flowId, instanceId}, {$set: {bluprint, hash}}, callback
