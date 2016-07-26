@@ -33,6 +33,46 @@ describe 'IotAppConfigurationSaver', ->
         expect(hash).to.equal 'b9a0d397b7ed55c26440b0281328735e06e961bda05869de6f4718f7fea8a8cb'
         done()
 
+
+  describe '->clear', ->
+
+    beforeEach 'insert flow', (done) ->
+      @flowData = JSON.stringify {
+        node1:
+          config: { bees: true }
+          data: {}
+        node2:
+          config: {bee_size: '4000m'}
+          data: {}
+      }
+
+      @datastore.insert appId: 'some-bluprint-uuid', version: '1', flowData: @flowData, done
+
+    beforeEach 'insert 2nd flow', (done) ->
+      @flowData = JSON.stringify {
+        node1:
+          config: { bees: true }
+          data: {}
+        node2:
+          config: {bee_size: '4000m'}
+          data: {}
+      }
+
+      @datastore.insert appId: 'some-bluprint-uuid', version: '2', flowData: @flowData, done
+
+    beforeEach (done) ->
+      @flowData =
+        router:
+          config: {}
+          data: {}
+
+      @sut.clear appId: 'some-bluprint-uuid', done
+
+    it 'should save to mongo', (done) ->
+      @datastore.findOne {appId: 'some-bluprint-uuid'}, (error, result) =>
+        expect(result).not.to.exist
+        done()
+
   describe '->stop', ->
     describe 'with one instance', ->
       beforeEach (done) ->

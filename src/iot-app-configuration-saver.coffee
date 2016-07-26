@@ -13,6 +13,9 @@ class IotAppConfigurationSaver
     hash = @hash flowData
     @datastore.insert {appId, version, flowData, hash}, callback
 
+  clear: ({appId}, callback) =>
+    @datastore.remove {appId}, callback
+
   linkToBluprint: ({appId, config, configSchema, flowId, instanceId, version}, callback) =>
     @datastore.findOne {flowId, instanceId}, (error, {flowData}) =>
       return callback error if error?
